@@ -1,11 +1,64 @@
-from flask import render_template, url_for, flash, redirect, request
+from flask import Blueprint, render_template, redirect, url_for, session, current_app, request, flash
 from app import app, db, socketio
 from app.models import User, Meeting, Event
 from flask_login import login_user, current_user, logout_user, login_required
 from flask_socketio import send
 from datetime import datetime
+from werkzeug.security import generate_password_hash, check_password_hash
+# from app.forms import RegistrationForm
+from flask_oauthlib.client import OAuth
+import requests
+from app import db, login_manager
 
 
+
+auth = Blueprint('auth', __name__)
+
+oauth = OAuth()
+
+google = oauth.remote_app(
+    'google',
+    consumer_key=current_app.config.get('GOOGLE_CLIENT_ID'),
+    consumer_secret=current_app.config.get('GOOGLE_CLIENT_SECRET'),
+    request_token_params={
+        'scope': 'email',
+    },
+    base_url=current_app.config.get('GOOGLE_DISCOVERY_URL'),
+    request_token_url=None,
+    access_token_method='POST',
+    access_token_url='https://oauth2.googleapis.com/token',
+    authorize_url='https://accounts.google.com/o/oauth2/auth',
+)
+
+@auth.route('/google/login')
+def google_login():
+    return google.authorize(callback=url_for('auth.google_authorized', _external=True))
+
+@auth.route('/google/callback')
+def google_authorized():
+    resp = google.authorized_response()
+    if resp is None or resp.get('access_token') is None:
+        return 'Access denied: reason={} error={}'.format(
+            request.args['error_reason'],
+            request.args['error_description']
+        )
+    
+    session['google_token'] = (resp['access_token'], '')
+    user_info = google.get('userinfo')
+    email = user_info.data['email']
+    # Handle user creation and login
+    # Example:
+    # user = User.query.filter_by(email=email).first()
+    # if not user:
+    #     user = User(email=email)
+    #     db.session.add(user)
+    #     db.session.commit()
+    # login_user(user)
+    return redirect(url_for('main.home'))
+
+@google.tokengetter
+def get_google_oauth_token():
+    return session.get('google_token')
 
 
 @app.route('/')
