@@ -5,10 +5,14 @@ from flask_login import login_user, current_user, logout_user, login_required
 from flask_socketio import send
 from datetime import datetime
 
+
+
+
 @app.route('/')
-@app.route('/home')
+@login_required
 def home():
     return render_template('home.html')
+
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():

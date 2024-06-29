@@ -1,9 +1,23 @@
-{% extends "base.html" %}
-{% block content %}
-<h2>Register</h2>
-<form method="POST">
-    <input type="email" name="email" placeholder="Email" required>
-    <input type="password" name="password" placeholder="Password" required>
-    <button type="submit">Register</button>
-</form>
-{% endblock %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Register</title>
+    <!-- Your CSS and other headers -->
+</head>
+<body>
+    <h2>Register</h2>
+
+    <!-- Your registration form -->
+    <form method="POST" action="{{ url_for('register') }}">
+       
+        <input type="email" name="email" placeholder="Email" required>
+        <input type="password" name="password" placeholder="Password" required>
+        <button type="submit">Register</button>
+    </form>
+
+    <!-- Optional: Link to login page -->
+    <p>Already have an account? <a href="{{ url_for('login') }}">Login here</a></p>
+
+    <!-- Your scripts and other footer content -->
+</body>
+</html>
