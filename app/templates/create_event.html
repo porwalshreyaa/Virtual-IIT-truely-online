@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Create Event</h2>
+<form method="POST">
+    <input type="text" name="name" placeholder="Event Name" required>
+    <input type="datetime-local" name="date" required>
+    <textarea name="description" placeholder="Description" required></textarea>
+    <button type="submit">Create Event</button>
+</form>
+{% endblock %}

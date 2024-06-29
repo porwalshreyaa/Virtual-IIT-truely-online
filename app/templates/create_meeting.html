@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Create Meeting</h2>
+<form method="POST">
+    <input type="text" name="location" placeholder="Location" required>
+    <input type="datetime-local" name="time" required>
+    <input type="url" name="google_meet_link" placeholder="Google Meet Link" required>
+    <button type="submit">Create Meeting</button>
+</form>
+{% endblock %}

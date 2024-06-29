@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Upcoming Meetings</h2>
+<ul>
+    {% for meeting in meetings %}
+        <li>{{ meeting.location }} at {{ meeting.time }} - <a href="{{ meeting.google_meet_link }}">Join</a></li>
+    {% endfor %}
+</ul>
+{% endblock %}

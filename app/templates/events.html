@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Upcoming Events</h2>
+<ul>
+    {% for event in events %}
+        <li>{{ event.name }} on {{ event.date }} - <a href="{{ url_for('chat', event_id=event.id) }}">Chat</a></li>
+    {% endfor %}
+</ul>
+{% endblock %}

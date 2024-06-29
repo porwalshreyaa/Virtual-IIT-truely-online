@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Chat for {{ event.name }}</h2>
+<ul id="messages"></ul>
+<input id="message" autocomplete="off"><button onclick="sendMessage()">Send</button>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.0.3/socket.io.js"></script>
+<script>
+    var socket = io();
+    socket.on('message', function(msg) {
+        var li = document.createElement("li");
+        li.appendChild(document.createTextNode(msg));
+        document.getElementById("messages").appendChild(li);
+    });
+    function sendMessage() {
+        var message = document.getElementById('message').value;
+        socket.send(message);
+        document.getElementById('message').value = '';
+    }
+</script>
+{% endblock %}
