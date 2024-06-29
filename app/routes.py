@@ -51,7 +51,7 @@ def login():
 
         if user and user.check_password(password):
             login_user(user)  # Log in the user
-            return redirect(url_for('home'))  # Redirect to home page after login
+            return redirect(url_for('index'))  # Redirect to home page after login
 
         flash('Invalid email or password')  # Display error message
         return redirect(url_for('login'))
