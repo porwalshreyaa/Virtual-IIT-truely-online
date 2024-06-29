@@ -4,94 +4,58 @@ from app.models import User, Meeting, Event
 from flask_login import login_user, current_user, logout_user, login_required
 from flask_socketio import send
 from datetime import datetime
-from werkzeug.security import generate_password_hash, check_password_hash
-# from app.forms import RegistrationForm
-from flask_oauthlib.client import OAuth
-import requests
-from app import db, login_manager
+# from werkzeug.security import generate_password_hash, check_password_hash
+# # from app.forms import RegistrationForm
+# from flask_oauthlib.client import OAuth
+# import requests
+# from app import db, login_manager
 
-
-
-auth = Blueprint('auth', __name__)
-
-oauth = OAuth()
-
-google = oauth.remote_app(
-    'google',
-    consumer_key=current_app.config.get('GOOGLE_CLIENT_ID'),
-    consumer_secret=current_app.config.get('GOOGLE_CLIENT_SECRET'),
-    request_token_params={
-        'scope': 'email',
-    },
-    base_url=current_app.config.get('GOOGLE_DISCOVERY_URL'),
-    request_token_url=None,
-    access_token_method='POST',
-    access_token_url='https://oauth2.googleapis.com/token',
-    authorize_url='https://accounts.google.com/o/oauth2/auth',
-)
-
-@auth.route('/google/login')
-def google_login():
-    return google.authorize(callback=url_for('auth.google_authorized', _external=True))
-
-@auth.route('/google/callback')
-def google_authorized():
-    resp = google.authorized_response()
-    if resp is None or resp.get('access_token') is None:
-        return 'Access denied: reason={} error={}'.format(
-            request.args['error_reason'],
-            request.args['error_description']
-        )
-    
-    session['google_token'] = (resp['access_token'], '')
-    user_info = google.get('userinfo')
-    email = user_info.data['email']
-    # Handle user creation and login
-    # Example:
-    # user = User.query.filter_by(email=email).first()
-    # if not user:
-    #     user = User(email=email)
-    #     db.session.add(user)
-    #     db.session.commit()
-    # login_user(user)
-    return redirect(url_for('main.home'))
-
-@google.tokengetter
-def get_google_oauth_token():
-    return session.get('google_token')
 
 
 @app.route('/')
 @login_required
-def home():
+def index():
     return render_template('home.html')
 
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
-    if current_user.is_authenticated:
-        return redirect(url_for('home'))
     if request.method == 'POST':
         email = request.form.get('email')
         password = request.form.get('password')
-        user = User(email=email, password=password)
-        db.session.add(user)
+
+        # Check if user already exists
+        existing_user = User.query.filter_by(email=email).first()
+        if existing_user:
+            flash('Email address already exists')
+            return redirect(url_for('register'))
+
+        # Create new user
+        new_user = User(email=email)
+        new_user.set_password(password)  # Hash the password before saving
+        db.session.add(new_user)
         db.session.commit()
-        login_user(user)
-        return redirect(url_for('home'))
+
+        flash('Account created successfully. Please log in.')
+        return redirect(url_for('login'))
+
     return render_template('register.html')
+
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    if current_user.is_authenticated:
-        return redirect(url_for('home'))
     if request.method == 'POST':
         email = request.form.get('email')
         password = request.form.get('password')
         user = User.query.filter_by(email=email).first()
-        if user and user.password == password:
-            login_user(user)
-            return redirect(url_for('home'))
+
+        if user and user.check_password(password):
+            login_user(user)  # Log in the user
+            return redirect(url_for('home'))  # Redirect to home page after login
+
+        flash('Invalid email or password')  # Display error message
+        return redirect(url_for('login'))
+
     return render_template('login.html')
 
 @app.route('/logout')

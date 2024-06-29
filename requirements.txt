@@ -1,8 +1,4 @@
-Flask
-Flask-Login
-Flask-SQLAlchemy
-Flask-SocketIO
-gunicornbidict==0.23.1
+bidict==0.23.1
 blinker==1.8.2
 cachelib==0.13.0
 certifi==2024.6.2
@@ -30,5 +26,5 @@ simple-websocket==1.0.0
 SQLAlchemy==2.0.31
 typing_extensions==4.12.2
 urllib3==2.2.2
-Werkzeug==3.0.3
+Werkzeug==1.0.1
 wsproto==1.2.0
