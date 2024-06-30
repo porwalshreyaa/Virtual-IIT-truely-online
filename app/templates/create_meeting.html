@@ -1,10 +1,26 @@
 {% extends "base.html" %}
 {% block content %}
-<h2>Create Meeting</h2>
-<form method="POST">
-    <input type="text" name="location" placeholder="Location" required>
-    <input type="datetime-local" name="time" required>
-    <input type="url" name="google_meet_link" placeholder="Google Meet Link" required>
-    <button type="submit">Create Meeting</button>
+<h1 class="text-4xl font-bold text-center mb-8">Schedule a Meeting</h1>
+<form class="bg-white p-8 rounded-lg shadow-md space-y-6" action="{{ url_for('add_meeting') }}" method="POST">
+    <div>
+        <label for="location" class="block text-lg font-semibold text-gray-700">Location:</label>
+        <input type="text" id="location" name="location" required class="mt-1 px-4 py-2 w-full border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+    </div>
+    <div>
+        <label for="time" class="block text-lg font-semibold text-gray-700">Time:</label>
+        <input type="datetime-local" id="time" name="time" required class="mt-1 px-4 py-2 w-full border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+    </div>
+    <div>
+        <label for="google_meet_link" class="block text-lg font-semibold text-gray-700">Google Meet Link:</label>
+        <input type="text" id="google_meet_link" name="google_meet_link" required class="mt-1 px-4 py-2 w-full border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+    </div>
+    <div>
+        <label for="user_emails" class="block text-lg font-semibold text-gray-700">User Emails (comma separated):</label>
+        <input type="text" id="user_emails" name="user_emails" required class="mt-1 px-4 py-2 w-full border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+    </div>
+    <div class="text-center">
+        <button type="submit" class="mt-4 bg-blue-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">Schedule</button>
+    </div>
 </form>
+
 {% endblock %}

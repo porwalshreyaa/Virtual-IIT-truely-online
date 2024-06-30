@@ -18,7 +18,7 @@ class User(db.Model, UserMixin):
     email = db.Column(db.String(120), unique=True, nullable=False)
     name = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(128), nullable=False)
-    meetings = db.relationship('Meeting', backref='user', lazy=True)
+    meetings = db.relationship('Meeting', lazy=True)
     user_homies = db.relationship('User', secondary=homies, primaryjoin=(homies.c.user_id == id), 
                              secondaryjoin=(homies.c.homie_id == id), 
                              backref=db.backref('homies', lazy='dynamic'), lazy='dynamic')

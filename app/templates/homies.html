@@ -1,33 +1,35 @@
 {% extends "base.html" %}
 {% block content %}
-<h1>Homies List</h1>
-<ul class="flex  space-x-4">
-    {% for homie in homies %}
-    <li class="bg-white p-4 rounded-lg shadow-md text-center">
-        <span class="text-lg font-bold text-gray-800">{{ homie.email }}</span>
-    </li>
-    {% endfor %}
-</ul>
-<br>
-<form action="{{ url_for('homies') }}" method="POST">
-    <label for="email">Add Homie:</label>
-    <input type="email" id="email" name="email" required>
-    <button type="submit" class="ml-4 bg-blue-500 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-700">Add</button>
-</form>
-{% with messages = get_flashed_messages() %}
-{% if message %}
-<ul class="mt-4">
-    {% for message in messages %}
-    <li class="bg-red-200 text-red-800 px-4 py-2 rounded-lg mb-2">{{ message }}</li>
-    {% endfor %}
-</ul>
-{% endif %}
-{% endwith %}
+<div class="max-w-lg mx-auto mt-6 p-6 bg-gray-800 rounded-lg shadow-md text-white">
+    <h1 class="text-2xl font-bold mb-4">Homies List</h1>
+    <ul class="space-y-4">
+        {% for homie in homies %}
+        <li class="bg-gray-700 p-4 rounded-lg shadow-md flex items-center justify-between">
+            <span class="text-lg font-bold text-gray-200">{{ homie.email }}</span>
+        </li>
+        {% endfor %}
+    </ul>
+
+    <form action="{{ url_for('homies') }}" method="POST" class="mt-6 flex items-center">
+        <label for="email" class="mr-4 text-gray-400">Add Homie:</label>
+        <input type="email" id="email" name="email" required class="px-4 py-2 w-56 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-200 bg-gray-700">
+        <button type="submit" class="ml-4 bg-blue-500 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">Add</button>
+    </form>
+
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <ul class="mt-4">
+        {% for message in messages %}
+        <li class="bg-red-600 text-red-100 px-4 py-2 rounded-lg mb-2">{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    {% endwith %}
+</div>
 
 <div class="fixed bottom-8 right-8">
     <a href="{{ url_for('homies') }}" class="bg-blue-500 text-white p-4 rounded-full shadow-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
-        <i class="fas fa-plus"></i>
+        <i class="fas fa-plus text-2xl"></i>
     </a>
 </div>
-
 {% endblock %}

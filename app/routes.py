@@ -64,22 +64,13 @@ def login():
 @login_required 
 def logout():
     logout_user() 
-
-    flash('You have been logged out successfully.', 'success')
-
     return redirect(url_for('index'))
 
 
 @app.route('/profile', methods=['GET', 'POST'])
 @login_required
 def profile():
-    if request.method == 'POST':
-        current_user.email = request.form['email']
-        if 'password' in request.form and request.form['password']:
-            current_user.set_password(request.form['password'])
-        db.session.commit()
-        flash('Profile updated successfully!', 'success')
-        return redirect(url_for('profile'))
+
     return render_template('profile.html')
 
 @app.route('/edit_profile', methods=['GET', 'POST'])
@@ -103,16 +94,21 @@ def events():
     return render_template('events.html', events=events)
 
 
-@app.route('/add_event', methods=['POST'])
+from datetime import datetime
+
+@app.route('/add_event', methods=['GET','POST'])
 @login_required
 def add_event():
-    name = request.form['name']
-    date = request.form['date']
-    description = request.form['description']
-    event = Event(name=name, date=date, description=description, creator_id=current_user.id)
-    db.session.add(event)
-    db.session.commit()
-    return redirect(url_for('events'))
+    if request.method == 'POST':
+        name = request.form['name']
+        date_str = request.form.get('date', '')
+        description = request.form['description']
+        date = datetime.strptime(date_str, '%Y-%m-%dT%H:%M')
+        event = Event(name=name, date=date, description=description, creator_id=current_user.id)
+        db.session.add(event)
+        db.session.commit()
+        return redirect(url_for('events'))
+    return render_template('create_event.html')
 
 
 @app.route('/meetings')
@@ -143,7 +139,7 @@ def add_meeting():
         flash('Meeting added successfully!', 'success')
         return redirect(url_for('meetings'))
     
-    return render_template('add_meeting.html')
+    return render_template('create_meeting.html')
 
 @app.route('/homies', methods=['GET', 'POST'])
 @login_required

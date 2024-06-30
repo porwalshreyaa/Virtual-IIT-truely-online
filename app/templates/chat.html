@@ -1,20 +1,44 @@
 {% extends "base.html" %}
 {% block content %}
-<h2>Chat for {{ event.name }}</h2>
-<ul id="messages"></ul>
-<input id="message" autocomplete="off"><button onclick="sendMessage()">Send</button>
+<div class="max-w-md mx-auto mt-6 p-6 bg-white rounded-lg shadow-md">
+    <h2 class="text-2xl font-bold mb-4">Chat for {{ event.name }}</h2>
+    <ul id="messages" class="mb-4 p-4 border border-gray-200 rounded-lg overflow-y-auto max-h-60 flex flex-col-reverse"></ul>
+    <div class="flex space-x-2">
+        <input id="message" class="flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" autocomplete="off">
+        <button onclick="sendMessage()" class="bg-blue-500 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">Send</button>
+    </div>
+</div>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.0.3/socket.io.js"></script>
 <script>
     var socket = io();
-    socket.on('message', function(msg) {
+    socket.on('message', function(data) {
+        var message = data.message;
+        var senderId = data.senderId;
+
         var li = document.createElement("li");
-        li.appendChild(document.createTextNode(msg));
-        document.getElementById("messages").appendChild(li);
+        li.textContent = message;
+
+        if (senderId === '{{ current_user.id }}') {
+            li.classList.add('text-right'); // Align current user's message to the right
+        } else {
+            li.classList.add('text-left'); // Align other users' messages to the left
+        }
+
+        // Insert new messages at the top of the list
+        var messagesList = document.getElementById("messages");
+        messagesList.insertBefore(li, messagesList.firstChild);
+
+        // Scroll to bottom on new message
+        messagesList.scrollTop = messagesList.scrollHeight;
     });
+
     function sendMessage() {
         var message = document.getElementById('message').value;
-        socket.send(message);
-        document.getElementById('message').value = '';
+        if (message.trim() !== '') {
+            socket.emit('message', message);
+            document.getElementById('message').value = '';
+        }
     }
 </script>
 {% endblock %}

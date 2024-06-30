@@ -8,44 +8,44 @@
     <link href="{{ url_for('static', filename='output.css') }}" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
-</head>
 
 <body class="bg-iit bg-cover flex flex-col text-gray-400 ">
-    <nav class="bg-zinc-950 text-white shadow-md">
+    <nav class="bg-zinc-950 bg-opacity-75 text-white shadow-md">
         <div class="container mx-auto px-6 py-4">
             <div class="flex items-center justify-between">
-                <div class="flex items-center">
-                    <a href="#">
-                        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Virtual IIT Madras Logo" class="h-8">
-                    </a>
-                </div>
+                <a href="#" class="flex items-center">
+                    <div class="text-center">
+                        <h1 class="text-3xl font-bold text-white">Virtual</h1>
+                        <h1 class="text-4xl font-bold text-white">IIT Madras</h1>
+                    </div>
+                    <!-- <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Virtual IIT Madras Logo" class="h-8 ml-4"> -->
+                </a>
                 <div class="flex items-center space-x-4">
-                    <a class="text-gray-300 hover:text-blue-300 flex space-x-4 font-medium py-2 px-4 rounded-md"
+                    <a class="text-gray-300 hover:text-blue-300 py-2 px-4 rounded-md"
                         href="{{ url_for('index') }}">Home</a>
-                    <a class="text-gray-300 hover:text-blue-300 flex space-x-4 font-medium py-2 px-4 rounded-md"
+                    <a class="text-gray-300 hover:text-blue-300 py-2 px-4 rounded-md"
                         href="{{ url_for('homies') }}">Homies</a>
-                    <a class="text-gray-300 hover:text-blue-300 flex space-x-4 font-medium py-2 px-4 rounded-md"
+                    <a class="text-gray-300 hover:text-blue-300 py-2 px-4 rounded-md"
                         href="{{ url_for('meetings') }}">Meetings</a>
-                    <a class="text-gray-300 hover:text-blue-300 flex space-x-4 font-medium py-2 px-4 rounded-md"
+                    <a class="text-gray-300 hover:text-blue-300 py-2 px-4 rounded-md"
                         href="{{ url_for('events') }}">Events</a>
-                        <a class="text-gray-300 hover:text-blue-300 flex space-x-4 font-medium py-2 px-4 rounded-md"
+                    <a class="text-gray-300 hover:text-blue-300 py-2 px-4 rounded-md"
                         href="{{ url_for('profile') }}">Profile</a>
                     {% if not current_user.is_authenticated %}
-                    <a class="text-gray-300 hover:text-blue-300 flex space-x-4 font-medium py-2 px-4 rounded-md"
+                    <a class="text-gray-300 hover:text-blue-300 py-2 px-4 rounded-md"
                         href="{{ url_for('login') }}">Login</a>
-                    <a class="text-gray-300 hover:text-blue-300 flex space-x-4 font-medium py-2 px-4 rounded-md"
+                    <a class="text-gray-300 hover:text-blue-300 py-2 px-4 rounded-md"
                         href="{{ url_for('register') }}">Register</a>
                     {% else %}
                     <!-- Add any other links you want to display for logged-in users -->
-                    <a class="text-gray-300 hover:text-blue-300 flex space-x-4 font-medium py-2 px-4 rounded-md"
+                    <a class="text-gray-300 hover:text-blue-300 py-2 px-4 rounded-md"
                         href="{{ url_for('logout') }}">Logout</a>
                     {% endif %}
                 </div>
             </div>
         </div>
     </nav>
-    <div class="container mx-auto px-6 py-4 items-center ju
-    stify-center ">
+    <div class="container mx-auto px-6 py-4 items-center justify-center">
         {% block content %}{% endblock %}
     </div>
 </body>
