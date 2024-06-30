@@ -2,8 +2,24 @@
 {% block content %}
 <h2>Upcoming Meetings</h2>
 <ul>
-    {% for meeting in meetings %}
+
+    <h1>Meetings</h1>
+    <ul>
+        {% for meeting in meetings %}
         <li>{{ meeting.location }} at {{ meeting.time }} - <a href="{{ meeting.google_meet_link }}">Join</a></li>
-    {% endfor %}
+        {% endfor %}
+    </ul>
+
+    <form action="{{ url_for('add_meeting') }}" method="POST">
+        <label for="location">Location:</label>
+        <input type="text" id="location" name="location" required><br>
+        <label for="time">Time:</label>
+        <input type="datetime-local" id="time" name="time" required><br>
+        <label for="google_meet_link">Google Meet Link:</label>
+        <input type="text" id="google_meet_link" name="google_meet_link" required><br>
+        <label for="user_emails">User Emails (comma separated):</label>
+        <input type="text" id="user_emails" name="user_emails" required><br>
+        <button type="submit">Add Meeting</button>
+    </form>
 </ul>
 {% endblock %}

@@ -1,26 +1,48 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Virtual IIT Madras</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="{{ url_for('static', filename='output.css') }}" rel="stylesheet">
 </head>
-<body>
-    <nav>
-        <ul>
-            <li><a href="{{ url_for('index') }}">Home</a></li>
-            {% if not current_user.is_authenticated %}
-            <li><a href="{{ url_for('login') }}">Login</a></li>
-            <li><a href="{{ url_for('register') }}">Register</a></li>
-            {% else %}
-            <!-- Add any other links you want to display for logged-in users -->
-            <li><a href="{{ url_for('logout') }}">Logout</a></li>
-            {% endif %}
-        </ul>
+
+<body class="bg-zinc-950 flex flex-col text-gray-400 ">
+    <nav class="bg-blue-950 text-white shadow-md">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                    <a href="#">
+                        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Virtual IIT Madras Logo" class="h-8">
+                    </a>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a class="text-gray-300 hover:text-blue-300 flex space-x-4 font-medium py-2 px-4 rounded-md"
+                        href="{{ url_for('index') }}">Home</a>
+                    <a class="text-gray-300 hover:text-blue-300 flex space-x-4 font-medium py-2 px-4 rounded-md"
+                        href="{{ url_for('homies') }}">Homies</a>
+                    <a class="text-gray-300 hover:text-blue-300 flex space-x-4 font-medium py-2 px-4 rounded-md"
+                        href="{{ url_for('meetings') }}">Meetings</a>
+                    <a class="text-gray-300 hover:text-blue-300 flex space-x-4 font-medium py-2 px-4 rounded-md"
+                        href="{{ url_for('events') }}">Events</a>
+                    {% if not current_user.is_authenticated %}
+                    <a class="text-gray-300 hover:text-blue-300 flex space-x-4 font-medium py-2 px-4 rounded-md"
+                        href="{{ url_for('login') }}">Login</a>
+                    <a class="text-gray-300 hover:text-blue-300 flex space-x-4 font-medium py-2 px-4 rounded-md"
+                        href="{{ url_for('register') }}">Register</a>
+                    {% else %}
+                    <!-- Add any other links you want to display for logged-in users -->
+                    <a class="text-gray-300 hover:text-blue-300 flex space-x-4 font-medium py-2 px-4 rounded-md"
+                        href="{{ url_for('logout') }}">Logout</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
     </nav>
-    <div class="container">
+    <div class="container mx-auto px-6 py-4 items-center justify-center ">
         {% block content %}{% endblock %}
     </div>
 </body>
+
 </html>

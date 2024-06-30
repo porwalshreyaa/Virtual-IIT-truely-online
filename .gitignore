@@ -7,10 +7,12 @@ __pycache__/
 .Python
 env/
 venv/
+node_modules/
 ENV/
 env.bak/
 venv.bak/
 venv/
+
 *.egg-info/
 
 # Flask files

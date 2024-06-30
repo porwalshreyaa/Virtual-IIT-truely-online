@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, redirect, url_for, session, current_app, request, flash
 from app import app, db, socketio
-from app.models import User, Meeting, Event
+from app.models import User, Meeting, Event, HomieAssociation
 from flask_login import login_user, current_user, logout_user, login_required
 from flask_socketio import send
 from datetime import datetime
@@ -59,41 +59,13 @@ def login():
     return render_template('login.html')
 
 @app.route('/logout')
+@login_required 
 def logout():
-    logout_user()
-    return redirect(url_for('home'))
+    logout_user() 
 
-@app.route('/create_meeting', methods=['GET', 'POST'])
-@login_required
-def create_meeting():
-    if request.method == 'POST':
-        location = request.form.get('location')
-        time = datetime.strptime(request.form.get('time'), '%Y-%m-%dT%H:%M')
-        google_meet_link = request.form.get('google_meet_link')
-        meeting = Meeting(location=location, time=time, google_meet_link=google_meet_link, creator_id=current_user.id)
-        db.session.add(meeting)
-        db.session.commit()
-        return redirect(url_for('meetings'))
-    return render_template('create_meeting.html')
+    flash('You have been logged out successfully.', 'success')
 
-@app.route('/meetings')
-@login_required
-def meetings():
-    meetings = Meeting.query.all()
-    return render_template('meetings.html', meetings=meetings)
-
-@app.route('/create_event', methods=['GET', 'POST'])
-@login_required
-def create_event():
-    if request.method == 'POST':
-        name = request.form.get('name')
-        date = datetime.strptime(request.form.get('date'), '%Y-%m-%dT%H:%M')
-        description = request.form.get('description')
-        event = Event(name=name, date=date, description=description, creator_id=current_user.id)
-        db.session.add(event)
-        db.session.commit()
-        return redirect(url_for('events'))
-    return render_template('create_event.html')
+    return redirect(url_for('index'))
 
 @app.route('/events')
 @login_required
@@ -101,11 +73,72 @@ def events():
     events = Event.query.all()
     return render_template('events.html', events=events)
 
+
+@app.route('/add_event', methods=['POST'])
+@login_required
+def add_event():
+    name = request.form['name']
+    date = request.form['date']
+    description = request.form['description']
+    event = Event(name=name, date=date, description=description, creator_id=current_user.id)
+    db.session.add(event)
+    db.session.commit()
+    return redirect(url_for('events'))
+
+
+
+@app.route('/meetings')
+@login_required
+def meetings():
+    meetings = Meeting.query.all()
+    return render_template('meetings.html', meetings=meetings)
+
+@app.route('/add_meeting', methods=['POST'])
+@login_required
+def add_meeting():
+    location = request.form['location']
+    time = request.form['time']
+    google_meet_link = request.form['google_meet_link']
+    user_emails = request.form['user_emails'].split(',')
+    meeting = Meeting(location=location, time=time, google_meet_link=google_meet_link, creator_id=current_user.id)
+    for email in user_emails:
+        user = User.query.filter_by(email=email.strip()).first()
+        if user:
+            meeting.users.append(user)
+    db.session.add(meeting)
+    db.session.commit()
+    return redirect(url_for('meetings'))
+
+@app.route('/homies')
+@login_required
+def homies():
+    homies = current_user.homies
+    return render_template('homies.html', homies=homies)
+
+@app.route('/add_homie', methods=['POST'])
+@login_required
+def add_homie():
+    homie_email = request.form['email']
+    homie = HomieAssociation.query.filter_by(user_id=current_user.id,homie_id=homie_email).first()
+    if homie and homie != current_user:
+        if homie not in current_user.homies:
+            current_user.homies.append(homie)
+            current_user.homies.append(homie_email)
+            db.session.commit()
+            flash('Homie added successfully!', 'success')
+        else:
+            flash('This user is already your homie.', 'info')
+    else:
+        flash('User not found or invalid.', 'danger')
+    return redirect(url_for('homies'))
+
+
 @app.route('/chat/<event_id>')
 @login_required
 def chat(event_id):
     event = Event.query.get_or_404(event_id)
     return render_template('chat.html', event=event)
+
 
 @socketio.on('message')
 def handle_message(msg):
