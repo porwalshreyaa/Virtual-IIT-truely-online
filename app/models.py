@@ -7,25 +7,22 @@ from datetime import datetime
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-user_meeting = db.Table('user_meeting',
-    db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True),
-    db.Column('meeting_id', db.Integer, db.ForeignKey('meeting.id'), primary_key=True)
+homies = db.Table(
+    'homies',
+    db.Column('user_id', db.Integer, db.ForeignKey('users.id'), primary_key=True),
+    db.Column('homie_id', db.Integer, db.ForeignKey('users.id'), primary_key=True)
 )
 
-class User(db.Model, UserMixin):
+class User(UserMixin, db.Model):
+    __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(150), unique=True, nullable=False)
     password_hash = db.Column(db.String(150), nullable=False)
-    homies = db.relationship(
-        'User', 
-        secondary='homie_association', 
-        primaryjoin='User.id==HomieAssociation.user_id', 
-        secondaryjoin='User.id==HomieAssociation.homie_id', 
-        backref='friends'
-    )
-    created_events = db.relationship('Event', backref='creator', lazy=True)
-    created_meetings = db.relationship('Meeting', backref='creator', lazy=True)
-    meetings = db.relationship('Meeting', secondary=user_meeting, back_populates='users')
+    # Add any other fields you need for the user model
+    homies = db.relationship('User', secondary=homies,
+                             primaryjoin=(homies.c.user_id == id),
+                             secondaryjoin=(homies.c.homie_id == id),
+                             backref=db.backref('homie_users', lazy='dynamic'))
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -33,28 +30,29 @@ class User(db.Model, UserMixin):
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
 
-class HomieAssociation(db.Model):
-    __tablename__ = 'homie_association'
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
-    homie_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
-
-
 class Event(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
     date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     description = db.Column(db.Text, nullable=False)
-    creator_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    creator_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
 
     def __repr__(self):
         return f'<Event {self.name}>'
 
+user_meeting = db.Table('user_meeting',
+    db.Column('user_id', db.Integer, db.ForeignKey('users.id'), primary_key=True),
+    db.Column('meeting_id', db.Integer, db.ForeignKey('meetings.id'), primary_key=True)
+)
+
 class Meeting(db.Model):
+    __tablename__ = 'meetings'
+
     id = db.Column(db.Integer, primary_key=True)
     location = db.Column(db.String(100), nullable=False)
     time = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     google_meet_link = db.Column(db.String(200), nullable=False)
-    creator_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    creator_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     users = db.relationship('User', secondary=user_meeting, back_populates='meetings')
 
     def __repr__(self):

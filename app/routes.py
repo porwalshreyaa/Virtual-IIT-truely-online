@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, redirect, url_for, session, current_app, request, flash
 from app import app, db, socketio
-from app.models import User, Meeting, Event, HomieAssociation
+from app.models import User, Meeting, Event
 from flask_login import login_user, current_user, logout_user, login_required
 from flask_socketio import send
 from datetime import datetime
@@ -86,51 +86,55 @@ def add_event():
     return redirect(url_for('events'))
 
 
-
 @app.route('/meetings')
 @login_required
 def meetings():
     meetings = Meeting.query.all()
     return render_template('meetings.html', meetings=meetings)
 
-@app.route('/add_meeting', methods=['POST'])
+@app.route('/add_meeting', methods=['GET', 'POST'])
 @login_required
 def add_meeting():
-    location = request.form['location']
-    time = request.form['time']
-    google_meet_link = request.form['google_meet_link']
-    user_emails = request.form['user_emails'].split(',')
-    meeting = Meeting(location=location, time=time, google_meet_link=google_meet_link, creator_id=current_user.id)
-    for email in user_emails:
-        user = User.query.filter_by(email=email.strip()).first()
-        if user:
-            meeting.users.append(user)
-    db.session.add(meeting)
-    db.session.commit()
-    return redirect(url_for('meetings'))
+    if request.method == 'POST':
+        location = request.form['location']
+        time = datetime.strptime(request.form['time'], '%Y-%m-%dT%H:%M')
+        google_meet_link = request.form['google_meet_link']
+        user_emails = request.form['user_emails'].split(',')
+        
+        meeting = Meeting(location=location, time=time, google_meet_link=google_meet_link, creator_id=current_user.id)
+        
+        for email in user_emails:
+            user = User.query.filter_by(email=email.strip()).first()
+            if user:
+                meeting.users.append(user)
+        
+        db.session.add(meeting)
+        db.session.commit()
+        
+        flash('Meeting added successfully!', 'success')
+        return redirect(url_for('main.meetings'))
+    
+    return render_template('add_meeting.html')
 
 @app.route('/homies')
 @login_required
 def homies():
-    homies = current_user.homies
-    return render_template('homies.html', homies=homies)
+    return render_template('homies.html', homies=current_user.homies)
 
-@app.route('/add_homie', methods=['POST'])
+@app.route('/add_homie', methods=['GET', 'POST'])
 @login_required
 def add_homie():
-    homie_email = request.form['email']
-    homie = HomieAssociation.query.filter_by(user_id=current_user.id,homie_id=homie_email).first()
-    if homie and homie != current_user:
-        if homie not in current_user.homies:
+    if request.method == 'POST':
+        email = request.form.get('email')
+        homie = User.query.filter_by(email=email).first()
+        if homie and homie != current_user:
             current_user.homies.append(homie)
-            current_user.homies.append(homie_email)
             db.session.commit()
             flash('Homie added successfully!', 'success')
         else:
-            flash('This user is already your homie.', 'info')
-    else:
-        flash('User not found or invalid.', 'danger')
-    return redirect(url_for('homies'))
+            flash('Homie not found or already added!', 'danger')
+        return redirect(url_for('main.add_homie'))
+    return render_template('add_homie.html')
 
 
 @app.route('/chat/<event_id>')
@@ -138,6 +142,7 @@ def add_homie():
 def chat(event_id):
     event = Event.query.get_or_404(event_id)
     return render_template('chat.html', event=event)
+
 
 
 @socketio.on('message')
