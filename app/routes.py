@@ -1,4 +1,5 @@
-from flask import Blueprint, render_template, redirect, url_for, session, current_app, request, flash
+from flask import Blueprint, render_template, redirect, url_for, session, current_app, request
+from flask import flash
 from app import app, db, socketio
 from app.models import User, Meeting, Event
 from flask_login import login_user, current_user, logout_user, login_required
@@ -21,6 +22,7 @@ def index():
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
+        name = request.form.get('name')
         email = request.form.get('email')
         password = request.form.get('password')
 
@@ -31,7 +33,7 @@ def register():
             return redirect(url_for('register'))
 
         # Create new user
-        new_user = User(email=email)
+        new_user = User(email=email, name=name)
         new_user.set_password(password)  # Hash the password before saving
         db.session.add(new_user)
         db.session.commit()
@@ -66,6 +68,33 @@ def logout():
     flash('You have been logged out successfully.', 'success')
 
     return redirect(url_for('index'))
+
+
+@app.route('/profile', methods=['GET', 'POST'])
+@login_required
+def profile():
+    if request.method == 'POST':
+        current_user.email = request.form['email']
+        if 'password' in request.form and request.form['password']:
+            current_user.set_password(request.form['password'])
+        db.session.commit()
+        flash('Profile updated successfully!', 'success')
+        return redirect(url_for('profile'))
+    return render_template('profile.html')
+
+@app.route('/edit_profile', methods=['GET', 'POST'])
+@login_required
+def edit_profile():
+    if request.method == 'POST':
+        current_user.email = request.form['email']
+        if 'password' in request.form and request.form['password']:
+            current_user.set_password(request.form['password'])
+        db.session.commit()
+        flash('Profile updated successfully!', 'success')
+        return redirect(url_for('profile'))
+    return render_template('edit_profile.html')
+
+
 
 @app.route('/events')
 @login_required
@@ -112,30 +141,27 @@ def add_meeting():
         db.session.commit()
         
         flash('Meeting added successfully!', 'success')
-        return redirect(url_for('main.meetings'))
+        return redirect(url_for('meetings'))
     
     return render_template('add_meeting.html')
 
-@app.route('/homies')
+@app.route('/homies', methods=['GET', 'POST'])
 @login_required
 def homies():
-    return render_template('homies.html', homies=current_user.homies)
-
-@app.route('/add_homie', methods=['GET', 'POST'])
-@login_required
-def add_homie():
+    homies = current_user.user_homies
     if request.method == 'POST':
         email = request.form.get('email')
         homie = User.query.filter_by(email=email).first()
-        if homie and homie != current_user:
-            current_user.homies.append(homie)
+        if homie and homie != current_user and homie not in current_user.user_homies:
+            current_user.user_homies.append(homie)
             db.session.commit()
             flash('Homie added successfully!', 'success')
+        elif homie in current_user.user_homies:
+            flash('Homie already added!', 'danger')
         else:
-            flash('Homie not found or already added!', 'danger')
-        return redirect(url_for('main.add_homie'))
-    return render_template('add_homie.html')
-
+            flash('Homie not found!', 'danger')
+        return redirect(url_for('homies'))
+    return render_template('homies.html', homies=homies)
 
 @app.route('/chat/<event_id>')
 @login_required

@@ -6,9 +6,10 @@ module.exports = {
   ],
   theme: {
     extend: {
-      fontFamily: {
-        calligraphy: ['Great Vibes', 'cursive']
-      },
+      
+      backgroundImage: {
+        iit: "url('images/bg.png')",
+      }
     },
   },
   plugins: [],

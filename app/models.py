@@ -12,17 +12,16 @@ homies = db.Table(
     db.Column('user_id', db.Integer, db.ForeignKey('users.id'), primary_key=True),
     db.Column('homie_id', db.Integer, db.ForeignKey('users.id'), primary_key=True)
 )
-
-class User(UserMixin, db.Model):
+class User(db.Model, UserMixin):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String(150), unique=True, nullable=False)
-    password_hash = db.Column(db.String(150), nullable=False)
-    # Add any other fields you need for the user model
-    homies = db.relationship('User', secondary=homies,
-                             primaryjoin=(homies.c.user_id == id),
-                             secondaryjoin=(homies.c.homie_id == id),
-                             backref=db.backref('homie_users', lazy='dynamic'))
+    email = db.Column(db.String(120), unique=True, nullable=False)
+    name = db.Column(db.String(120), unique=True, nullable=False)
+    password_hash = db.Column(db.String(128), nullable=False)
+    meetings = db.relationship('Meeting', backref='user', lazy=True)
+    user_homies = db.relationship('User', secondary=homies, primaryjoin=(homies.c.user_id == id), 
+                             secondaryjoin=(homies.c.homie_id == id), 
+                             backref=db.backref('homies', lazy='dynamic'), lazy='dynamic')
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)

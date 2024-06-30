@@ -6,4 +6,10 @@
         <li>{{ event.name }} on {{ event.date }} - <a href="{{ url_for('chat', event_id=event.id) }}">Chat</a></li>
     {% endfor %}
 </ul>
+
+<div class="fixed bottom-8 right-8">
+    <a href="{{ url_for('homies') }}" class="bg-blue-500 text-white p-4 rounded-full shadow-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
+        <i class="fas fa-plus"></i>
+    </a>
+</div>
 {% endblock %}

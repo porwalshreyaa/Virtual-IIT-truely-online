@@ -6,10 +6,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Virtual IIT Madras</title>
     <link href="{{ url_for('static', filename='output.css') }}" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
 </head>
 
-<body class="bg-zinc-950 flex flex-col text-gray-400 ">
-    <nav class="bg-blue-950 text-white shadow-md">
+<body class="bg-iit bg-cover flex flex-col text-gray-400 ">
+    <nav class="bg-zinc-950 text-white shadow-md">
         <div class="container mx-auto px-6 py-4">
             <div class="flex items-center justify-between">
                 <div class="flex items-center">
@@ -26,6 +28,8 @@
                         href="{{ url_for('meetings') }}">Meetings</a>
                     <a class="text-gray-300 hover:text-blue-300 flex space-x-4 font-medium py-2 px-4 rounded-md"
                         href="{{ url_for('events') }}">Events</a>
+                        <a class="text-gray-300 hover:text-blue-300 flex space-x-4 font-medium py-2 px-4 rounded-md"
+                        href="{{ url_for('profile') }}">Profile</a>
                     {% if not current_user.is_authenticated %}
                     <a class="text-gray-300 hover:text-blue-300 flex space-x-4 font-medium py-2 px-4 rounded-md"
                         href="{{ url_for('login') }}">Login</a>
@@ -40,7 +44,8 @@
             </div>
         </div>
     </nav>
-    <div class="container mx-auto px-6 py-4 items-center justify-center ">
+    <div class="container mx-auto px-6 py-4 items-center ju
+    stify-center ">
         {% block content %}{% endblock %}
     </div>
 </body>

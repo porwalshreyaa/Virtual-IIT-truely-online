@@ -1,18 +1,33 @@
 {% extends "base.html" %}
 {% block content %}
 <h1>Homies List</h1>
-   {% if homies|length == 0 %}
-        <p>No homies yet. Add some!</p>
-    {% else %}
-    <ul>
-        {% for homie in homies %}
-            <li>{{ homie.email }}</li>
-        {% endfor %}
-    </ul>
+<ul class="flex  space-x-4">
+    {% for homie in homies %}
+    <li class="bg-white p-4 rounded-lg shadow-md text-center">
+        <span class="text-lg font-bold text-gray-800">{{ homie.email }}</span>
+    </li>
+    {% endfor %}
+</ul>
+<br>
+<form action="{{ url_for('homies') }}" method="POST">
+    <label for="email">Add Homie:</label>
+    <input type="email" id="email" name="email" required>
+    <button type="submit" class="ml-4 bg-blue-500 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-700">Add</button>
+</form>
+{% with messages = get_flashed_messages() %}
+{% if message %}
+<ul class="mt-4">
+    {% for message in messages %}
+    <li class="bg-red-200 text-red-800 px-4 py-2 rounded-lg mb-2">{{ message }}</li>
+    {% endfor %}
+</ul>
 {% endif %}
-    <form action="{{ url_for('add_homie') }}" method="POST">
-        <label for="email">Add Homie:</label>
-        <input type="email" id="email" name="email" required>
-        <button type="submit">Add</button>
-    </form>
+{% endwith %}
+
+<div class="fixed bottom-8 right-8">
+    <a href="{{ url_for('homies') }}" class="bg-blue-500 text-white p-4 rounded-full shadow-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
+        <i class="fas fa-plus"></i>
+    </a>
+</div>
+
 {% endblock %}

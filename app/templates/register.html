@@ -8,12 +8,12 @@
     <link href="{{ url_for('static', filename='output.css') }}" rel="stylesheet">
 </head>
 
-<body class="bg-gray-100">
+<body class="bg-iit bg-cover flex flex-col text-gray-400 container mx-auto px-6 py-4 items-center justify-center ">
     <h2>Register</h2>
 
     <!-- Your registration form -->
     <form method="POST" action="{{ url_for('register') }}">
-       
+        <input type="text" name="name" placeholder="Name" required>
         <input type="email" name="email" placeholder="Email" required>
         <input type="password" name="password" placeholder="Password" required>
         <button type="submit">Register</button>
